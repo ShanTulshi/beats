@@ -66,7 +66,7 @@ func ParseURL(module mb.Module, host string) (mb.HostData, error) {
 	return parse.NewHostDataFromURL(u), nil
 }
 
-// NewDirectSession estbalishes direct connections with a list of hosts. It uses the supplied
+// NewDirectSession establishes direct connections with a list of hosts. It uses the supplied
 // dialInfo parameter as a template for establishing more direct connections
 func NewDirectSession(dialInfo *mgo.DialInfo) (*mgo.Session, error) {
 	// make a copy
