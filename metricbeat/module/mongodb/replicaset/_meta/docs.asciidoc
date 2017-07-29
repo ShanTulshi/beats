@@ -1,0 +1,3 @@
+=== MongoDB ReplicaSet Metricset
+
+This is the `replicaset` metricset of the MongoDB module.

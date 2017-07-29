@@ -1,0 +1,93 @@
+{
+    "set" : "replset",
+    "date" : ISODate("2016-11-02T20:02:16.543Z"),
+    "myState" : 1,
+    "term" : NumberLong(1),
+    "heartbeatIntervalMillis" : NumberLong(2000),
+    "optimes" : {
+          "lastCommittedOpTime" : {
+             "ts" : Timestamp(1478116934, 1),
+             "t" : NumberLong(1)
+          },
+          "readConcernMajorityOpTime" : {
+             "ts" : Timestamp(1478116934, 1),
+             "t" : NumberLong(1)
+          },
+          "appliedOpTime" : {
+             "ts" : Timestamp(1478116934, 1),
+             "t" : NumberLong(1)
+          },
+          "durableOpTime" : {
+             "ts" : Timestamp(1478116934, 1),
+             "t" : NumberLong(1)
+          }
+       },
+
+    "members" : [
+        {
+            "_id" : 0,
+            "name" : "m1.example.net:27017",
+            "health" : 1,
+            "state" : 1,
+            "stateStr" : "PRIMARY",
+            "uptime" : 269,
+            "optime" : {
+                        "ts" : Timestamp(1478116934, 1),
+                        "t" : NumberLong(1)
+            },
+            "optimeDate" : ISODate("2016-11-02T20:02:14Z"),
+            "infoMessage" : "could not find member to sync from",
+            "electionTime" : Timestamp(1478116933, 1),
+            "electionDate" : ISODate("2016-11-02T20:02:13Z"),
+            "configVersion" : 1,
+            "self" : true
+        },
+        {
+            "_id" : 1,
+            "name" : "m2.example.net:27017",
+            "health" : 1,
+            "state" : 2,
+            "stateStr" : "SECONDARY",
+            "uptime" : 14,
+            "optime" : {
+               "ts" : Timestamp(1478116934, 1),
+               "t" : NumberLong(1)
+            },
+            "optimeDurable" : {
+               "ts" : Timestamp(1478116934, 1),
+               "t" : NumberLong(1)
+            },
+            "optimeDate" : ISODate("2016-11-02T20:02:14Z"),
+            "optimeDurableDate" : ISODate("2016-11-02T20:02:14Z"),
+            "lastHeartbeat" : ISODate("2016-11-02T20:02:15.618Z"),
+            "lastHeartbeatRecv" : ISODate("2016-11-02T20:02:14.866Z"),
+            "pingMs" : NumberLong(0),
+            "syncingTo" : "m3.example.net:27017",
+            "configVersion" : 1
+        },
+        {
+            "_id" : 2,
+            "name" : "m3.example.net:27017",
+            "health" : 1,
+            "state" : 2,
+            "stateStr" : "SECONDARY",
+            "uptime" : 14,
+            "optime" : {
+               "ts" : Timestamp(1478116934, 1),
+               "t" : NumberLong(1)
+            },
+            "optimeDurable" : {
+               "ts" : Timestamp(1478116934, 1),
+               "t" : NumberLong(1)
+            },
+            "optimeDate" : ISODate("2016-11-02T20:02:14Z"),
+            "optimeDurableDate" : ISODate("2016-11-02T20:02:14Z"),
+            "lastHeartbeat" : ISODate("2016-11-02T20:02:15.619Z"),
+            "lastHeartbeatRecv" : ISODate("2016-11-02T20:02:14.787Z"),
+            "pingMs" : NumberLong(0),
+            "syncingTo" : "m1.example.net:27018",
+            "configVersion" : 1
+        }
+    ],
+    "ok" : 1
+}
