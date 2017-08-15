@@ -60,6 +60,21 @@ func TestField(t *testing.T) {
 			},
 		},
 		{
+			field:  Field{Type: "array"},
+			method: func(f Field) common.MapStr { return f.array() },
+			output: common.MapStr{},
+		},
+		{
+			field:  Field{Type: "array", ObjectType: "text"},
+			method: func(f Field) common.MapStr { return f.array() },
+			output: common.MapStr{"type": "text"},
+		},
+		{
+			field:  Field{Type: "array", Index: &falseVar, ObjectType: "keyword"},
+			method: func(f Field) common.MapStr { return f.array() },
+			output: common.MapStr{"index": false, "type": "keyword"},
+		},
+		{
 			field:  Field{Type: "object", Enabled: &falseVar},
 			method: func(f Field) common.MapStr { return f.object() },
 			output: common.MapStr{
@@ -167,6 +182,20 @@ func TestField(t *testing.T) {
 			method: func(f Field) common.MapStr { return f.other() },
 			output: common.MapStr{
 				"type": "text", "index": true,
+			},
+		},
+		{
+			field:  Field{Type: "long", DocValues: &falseVar},
+			method: func(f Field) common.MapStr { return f.other() },
+			output: common.MapStr{
+				"type": "long", "doc_values": false,
+			},
+		},
+		{
+			field:  Field{Type: "text", DocValues: &trueVar},
+			method: func(f Field) common.MapStr { return f.other() },
+			output: common.MapStr{
+				"type": "text", "doc_values": true,
 			},
 		},
 	}

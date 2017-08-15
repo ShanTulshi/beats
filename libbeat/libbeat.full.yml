@@ -1,68 +1,3 @@
-########################## Auditbeat Configuration #############################
-
-# This is a reference configuration file documenting all non-deprecated options
-# in comments. For a shorter configuration example that contains only the most
-# common options, please see auditbeat.yml in the same directory.
-#
-# You can find the full configuration reference here:
-# https://www.elastic.co/guide/en/beats/auditbeat/index.html
-
-#============================  Config Reloading ================================
-
-# Config reloading allows to dynamically load modules. Each file which is
-# monitored must contain one or multiple modules as a list.
-auditbeat.config.modules:
-
-  # Glob pattern for configuration reloading
-  path: ${path.config}/conf.d/*.yml
-
-  # Period on which files under path should be checked for changes
-  reload.period: 10s
-
-  # Set to true to enable config reloading
-  reload.enabled: false
-
-# Maximum amount of time to randomly delay the start of a metricset. Use 0 to
-# disable startup delay.
-auditbeat.max_start_delay: 10s
-
-#==========================  Modules configuration =============================
-auditbeat.modules:
-
-# The kernel metricset collects events from the audit framework in the Linux
-# kernel. You need to specify audit rules for the events that you want to audit.
-- module: audit
-  metricsets: [kernel]
-  kernel.resolve_ids: true
-  kernel.failure_mode: silent
-  kernel.backlog_limit: 8196
-  kernel.rate_limit: 0
-  kernel.include_raw_message: false
-  kernel.include_warnings: false
-  kernel.audit_rules: |
-    # Define audit rules here.
-    # Create file watches (-w) or syscall audits (-a or -A). For example:
-    #-w /etc/passwd -p wa -k identity
-    #-a always,exit -F arch=b32 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EPERM -k access
-
-# The file integrity metricset sends events when files are changed (created,
-# updated, deleted). The events contain file metadata and hashes.
-- module: audit
-  metricsets: [file]
-  file.paths:
-  - /bin
-  - /usr/bin
-  - /sbin
-  - /usr/sbin
-  - /etc
-  
-  # Limit on the size of files that will be hashed. Default is 100 MiB.
-  file.max_file_size: 100 MiB
-
-  # Hash types to compute when the file changes. Supported types are md5, sha1,
-  # sha224, sha256, sha384, sha512, sha512_224, and sha512_256. Default is sha1.
-  file.hash_types: [sha1]
-
 
 #================================ General ======================================
 
@@ -87,25 +22,12 @@ auditbeat.modules:
 # sub-dictionary. Default is false.
 #fields_under_root: false
 
-# Internal queue configuration for buffering events to be published.
-#queue:
-  # Queue type by name (default 'mem')
-  # The memory queue will present all available events (up to the outputs
-  # bulk_max_size) to the output, the moment the output is ready to server
-  # another batch of events.
-  #mem:
-    # Max number of events the queue can buffer.
-    #events: 4096
+# Internal queue size for single events in processing pipeline
+#queue_size: 1000
 
-    # Hints the minimum number of events stored in the queue,
-    # before providing a batch of events to the outputs.
-    # A value of 0 (the default) ensures events are immediately available
-    # to be sent to the outputs.
-    #flush.min_events: 0
-
-    # Maximum duration after which events are available to the outputs,
-    # if the number of events stored in the queue is < min_flush_events.
-    #flush.timeout: 0s
+# The internal queue size for bulk events in the processing pipeline.
+# Do not modify this value.
+#bulk_queue_size: 0
 
 # Sets the maximum number of CPUs that can be executing simultaneously. The
 # default is the number of logical CPUs available in the system.
@@ -142,38 +64,16 @@ auditbeat.modules:
 #           http.code: 200
 #
 # The following example enriches each event with metadata from the cloud
-# provider about the host machine. It works on EC2, GCE, DigitalOcean,
-# Tencent Cloud, and Alibaba Cloud.
+# provider about the host machine. It works on EC2, GCE, and DigitalOcean.
 #
 #processors:
-#- add_cloud_metadata: ~
+#- add_cloud_metadata:
 #
-# The following example enriches each event with the machine's local time zone
-# offset from UTC.
+# The following example enriches each event with the local timezone.
 #
 #processors:
 #- add_locale:
-#    format: offset
 #
-# The following example enriches each event with docker metadata, it matches
-# given fields to an existing container id and adds info from that container:
-#
-#processors:
-#- add_docker_metadata:
-#    host: "unix:///var/run/docker.sock"
-#    match_fields: ["system.process.cgroup.id"]
-#    # To connect to Docker over TLS you must specify a client and CA certificate.
-#    #ssl:
-#    #  certificate_authority: "/etc/pki/root/ca.pem"
-#    #  certificate:           "/etc/pki/client/cert.pem"
-#    #  key:                   "/etc/pki/client/cert.key"
-#
-# The following example enriches each event with docker metadata, it matches
-# container id from log path available in `source` field (by default it expects
-# it to be /var/lib/docker/containers/*/*.log).
-#
-#processors:
-#- add_docker_metadata: ~
 
 #================================ Outputs ======================================
 
@@ -207,9 +107,9 @@ output.elasticsearch:
   # Number of workers per Elasticsearch host.
   #worker: 1
 
-  # Optional index name. The default is "auditbeat" plus date
-  # and generates [auditbeat-]YYYY.MM.DD keys.
-  #index: "auditbeat-%{[beat.version]}-%{+yyyy.MM.dd}"
+  # Optional index name. The default is "libbeat" plus date
+  # and generates [libbeat-]YYYY.MM.DD keys.
+  #index: "libbeat-%{[beat.version]}-%{+yyyy.MM.dd}"
 
   # Optional ingest node pipeline. By default no pipeline will be used.
   #pipeline: ""
@@ -235,6 +135,11 @@ output.elasticsearch:
 
   # Configure http request timeout before failing an request to Elasticsearch.
   #timeout: 90
+
+  # The number of seconds to wait for new events between two bulk API index requests.
+  # If `bulk_max_size` is reached before this interval expires, addition bulk index
+  # requests are made.
+  #flush_interval: 1s
 
   # Use SSL settings for HTTPS. Default is true.
   #ssl.enabled: true
@@ -283,23 +188,16 @@ output.elasticsearch:
   # Set gzip compression level.
   #compression_level: 3
 
-  # Optional maximum time to live for a connection to Logstash, after which the
-  # connection will be re-established.  A value of `0s` (the default) will
-  # disable this feature.
-  #
-  # Not yet supported for async connections (i.e. with the "pipelining" option set)
-  #ttl: 30s
-
   # Optional load balance the events between the Logstash hosts
   #loadbalance: true
 
-  # Number of batches to be sent asynchronously to logstash while processing
+  # Number of batches to be send asynchronously to logstash while processing
   # new batches.
-  #pipelining: 5
+  #pipelining: 0
 
   # Optional index name. The default index name is set to name of the beat
   # in all lowercase.
-  #index: 'auditbeat'
+  #index: 'libbeat'
 
   # SOCKS5 proxy server URL
   #proxy_url: socks5://user:password@socks5-server:2233
@@ -374,7 +272,7 @@ output.elasticsearch:
   #username: ''
   #password: ''
 
-  # Kafka version auditbeat is assumed to run against. Defaults to the oldest
+  # Kafka version libbeat is assumed to run against. Defaults to the oldest
   # supported stable version (currently version 0.8.2.0)
   #version: 0.8.2
 
@@ -435,6 +333,9 @@ output.elasticsearch:
   # on error.
   #required_acks: 1
 
+  # The number of seconds to wait for new events between two producer API calls.
+  #flush_interval: 1s
+
   # The configurable ClientID used for logging, debugging, and auditing
   # purposes.  The default is "beats".
   #client_id: beats
@@ -486,8 +387,8 @@ output.elasticsearch:
   #port: 6379
 
   # The name of the Redis list or channel the events are published to. The
-  # default is auditbeat.
-  #key: auditbeat
+  # default is libbeat.
+  #key: libbeat
 
   # The password to authenticate with. The default is no authentication.
   #password:
@@ -576,14 +477,14 @@ output.elasticsearch:
 
   # Path to the directory where to save the generated files. The option is
   # mandatory.
-  #path: "/tmp/auditbeat"
+  #path: "/tmp/libbeat"
 
-  # Name of the generated files. The default is `auditbeat` and it generates
-  # files: `auditbeat`, `auditbeat.1`, `auditbeat.2`, etc.
-  #filename: auditbeat
+  # Name of the generated files. The default is `libbeat` and it generates
+  # files: `libbeat`, `libbeat.1`, `libbeat.2`, etc.
+  #filename: libbeat
 
   # Maximum size in kilobytes of each file. When this size is reached, and on
-  # every auditbeat restart, the files are rotated. The default value is 10240
+  # every libbeat restart, the files are rotated. The default value is 10240
   # kB.
   #rotate_every_kb: 10000
 
@@ -603,26 +504,26 @@ output.elasticsearch:
 
 #================================= Paths ======================================
 
-# The home path for the auditbeat installation. This is the default base path
+# The home path for the libbeat installation. This is the default base path
 # for all other path settings and for miscellaneous files that come with the
 # distribution (for example, the sample dashboards).
 # If not set by a CLI flag or in the configuration file, the default for the
 # home path is the location of the binary.
 #path.home:
 
-# The configuration path for the auditbeat installation. This is the default
+# The configuration path for the libbeat installation. This is the default
 # base path for configuration files, including the main YAML configuration file
 # and the Elasticsearch template file. If not set by a CLI flag or in the
 # configuration file, the default for the configuration path is the home path.
 #path.config: ${path.home}
 
-# The data path for the auditbeat installation. This is the default base path
-# for all the files in which auditbeat needs to store its data. If not set by a
+# The data path for the libbeat installation. This is the default base path
+# for all the files in which libbeat needs to store its data. If not set by a
 # CLI flag or in the configuration file, the default for the data path is a data
 # subdirectory inside the home path.
 #path.data: ${path.home}/data
 
-# The logs path for a auditbeat installation. This is the default location for
+# The logs path for a libbeat installation. This is the default location for
 # the Beat's log files. If not set by a CLI flag or in the configuration file,
 # the default for the logs path is a logs subdirectory inside the home path.
 #path.logs: ${path.home}/logs
@@ -630,25 +531,34 @@ output.elasticsearch:
 #============================== Dashboards =====================================
 # These settings control loading the sample dashboards to the Kibana index. Loading
 # the dashboards is disabled by default and can be enabled either by setting the
-# options here, or by using the `-setup` CLI flag or the `setup` command.
+# options here, or by using the `-setup` CLI flag.
 #setup.dashboards.enabled: false
 
-# The directory from where to read the dashboards. The default is the `kibana`
-# folder in the home path.
-#setup.dashboards.directory: ${path.home}/kibana
-
-# The URL from where to download the dashboards archive. It is used instead of
-# the directory if it has a value.
+# The URL from where to download the dashboards archive. By default this URL
+# has a value which is computed based on the Beat name and version. For released
+# versions, this URL points to the dashboard archive on the artifacts.elastic.co
+# website.
 #setup.dashboards.url:
 
+# The directory from where to read the dashboards. It is used instead of the URL
+# when it has a value.
+#setup.dashboards.directory:
+
 # The file archive (zip file) from where to read the dashboards. It is used instead
-# of the directory when it has a value.
+# of the URL when it has a value.
 #setup.dashboards.file:
+
+# If this option is enabled, the snapshot URL is used instead of the default URL.
+#setup.dashboards.snapshot: false
+
+# The URL from where to download the snapshot version of the dashboards. By default
+# this has a value which is computed based on the Beat name and version.
+#setup.dashboards.snapshot_url
 
 # In case the archive contains the dashboards from multiple Beats, this lets you
 # select which one to load. You can load all the dashboards in the archive by
 # setting this to the empty string.
-#setup.dashboards.beat: auditbeat
+#setup.dashboards.beat: libbeat
 
 # The name of the Kibana index to use for setting the configuration. Default is ".kibana"
 #setup.dashboards.kibana_index: .kibana
@@ -666,10 +576,10 @@ output.elasticsearch:
 # Set to false to disable template loading.
 #setup.template.enabled: true
 
-# Template name. By default the template name is auditbeat.
+# Template name. By default the template name is libbeat.
 # The version of the beat will always be appended to the given name
-# so the final name is auditbeat-%{[beat.version]}.
-#setup.template.name: "auditbeat"
+# so the final name is libbeat-%{[beat.version]}.
+#setup.template.name: "libbeat"
 
 # Path to fields.yml file to generate the template
 #setup.template.fields: "${path.config}/fields.yml"
@@ -677,74 +587,19 @@ output.elasticsearch:
 # Overwrite existing template
 #setup.template.overwrite: false
 
-# Elasticsearch template settings
-setup.template.settings:
 
-  # A dictionary of settings to place into the settings.index dictionary
-  # of the Elasticsearch template. For more details, please check
-  # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html
-  #index:
-    #number_of_shards: 1
-    #codec: best_compression
+#================================ HTTP Endpoint ======================================
+# Each beat can expose internal data points through a http endpoint. For security
+# reason the endpoint is disabled by default. This feature is currently in beta.
 
-  # A dictionary of settings for the _source field. For more details, please check
-  # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html
-  #_source:
-    #enabled: false
+# Defines if http endpoint is enabled
+#http.enabled: false
 
-#============================== Kibana =====================================
+# Host to expose the http endpoint to. It is recommended to use only localhost.
+#http.host: localhost
 
-# Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API.
-# This requires a Kibana endpoint configuration.
-setup.kibana:
-
-  # Kibana Host
-  # Scheme and port can be left out and will be set to the default (http and 5601)
-  # In case you specify and additional path, the scheme is required: http://localhost:5601/path
-  # IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
-  #host: "localhost:5601"
-
-  # Optional protocol and basic auth crendentials.
-  #protocol: "https"
-  #username: "elastic"
-  #password: "changeme"
-
-  # Optional HTTP Path
-  #path: ""
-
-  # Use SSL settings for HTTPS. Default is true.
-  #ssl.enabled: true
-
-  # Configure SSL verification mode. If `none` is configured, all server hosts
-  # and certificates will be accepted. In this mode, SSL based connections are
-  # susceptible to man-in-the-middle attacks. Use only for testing. Default is
-  # `full`.
-  #ssl.verification_mode: full
-
-  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
-  # 1.2 are enabled.
-  #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
-
-  # SSL configuration. By default is off.
-  # List of root certificates for HTTPS server verifications
-  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
-
-  # Certificate for SSL client authentication
-  #ssl.certificate: "/etc/pki/client/cert.pem"
-
-  # Client Certificate Key
-  #ssl.key: "/etc/pki/client/cert.key"
-
-  # Optional passphrase for decrypting the Certificate Key.
-  #ssl.key_passphrase: ''
-
-  # Configure cipher suites to be used for SSL connections
-  #ssl.cipher_suites: []
-
-  # Configure curve types for ECDHE based cipher suites
-  #ssl.curve_types: []
-
-
+# Port on which the http endpoint is exposed. Default is 5066
+#http.port: 5066
 
 #================================ Logging ======================================
 # There are three options for the log output: syslog, file, stderr.
@@ -763,7 +618,7 @@ setup.kibana:
 # Send all logging output to syslog. The default is false.
 #logging.to_syslog: true
 
-# If enabled, auditbeat periodically logs its internal metrics that have changed
+# If enabled, libbeat periodically logs its internal metrics that have changed
 # in the last period. For each metric that changed, the delta from the value at
 # the beginning of the period is logged. Also, the total values for
 # all non-zero internal metrics are logged on shutdown. The default is true.
@@ -778,10 +633,10 @@ logging.to_files: true
 logging.files:
   # Configure the path where the logs are written. The default is the logs directory
   # under the home path (the binary location).
-  #path: /var/log/auditbeat
+  #path: /var/log/libbeat
 
   # The name of the files where the logs are written to.
-  #name: auditbeat
+  #name: libbeat
 
   # Configure log file size limit. If limit is reached, log file will be
   # automatically rotated
@@ -790,5 +645,3 @@ logging.files:
   # Number of rotated log files to keep. Oldest files will be deleted first.
   #keepfiles: 7
 
-# Set to true to log messages in json format.
-#logging.json: false

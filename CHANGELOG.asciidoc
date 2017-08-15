@@ -15,6 +15,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 *Affecting all Beats*
 
 - The log directory (`path.log`) for Windows services is now set to `C:\ProgramData\[beatname]\logs`. {issue}4764[4764]
+- Fail if removed setting output.X.flush_interval is explicitly configured.
 
 *Auditbeat*
 
@@ -34,8 +35,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 
 *Affecting all Beats*
 - Fix go plugins not loaded when beat starts {pull}4799[4799]
-
 - Eliminate deprecated _default_ mapping in 6.x {pull}4864[4864]
+- Register kubernetes `field_format` matcher and remove logger in `Encode` API {pull}4888[4888]
 
 *Auditbeat*
 
@@ -65,6 +66,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 *Affecting all Beats*
 
 - Update init scripts to use the `test config` subcommand instead of the deprecated `-configtest` flag. {issue}4600[4600]
+- Get by default the credentials for connecting to Kibana from the Elasticsearch output configuration. {pull}4867[4867]
 
 *Auditbeat*
 
@@ -83,7 +85,8 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...master[Check the HEAD di
 - Add graphite protocol metricbeat module. {pull}4734[4734]
 - Add http server metricset to support push metrics via http. {pull}4770[4770]
 - Make config object public for graphite and http server {pull}4820[4820]
-
+- Add system uptime metricset. {issue}[4848[4848]
+ 
 *Packetbeat*
 
 *Winlogbeat*
