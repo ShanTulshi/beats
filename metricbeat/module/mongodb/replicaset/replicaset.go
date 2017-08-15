@@ -61,7 +61,7 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	}
 
 	if _, ok := result["errmsg"]; ok {
-		return nil, errors.New("Mongo cluster is not set up as a replicaset!")
+		return nil, errors.New("mongo cluster is not set up as a replicaset")
 	}
 
 	return result, nil
