@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/elastic/beats/libbeat/cmd/instance"
+	"github.com/elastic/beats/libbeat/paths"
 	"github.com/elastic/beats/libbeat/template"
 )
 
@@ -38,13 +39,14 @@ func GenTemplateConfigCmd(name, beatVersion string) *cobra.Command {
 				}
 			}
 
-			tmpl, err := template.New(b.Info.Version, version, index, cfg.Settings)
+			tmpl, err := template.New(b.Info.Version, index, version, cfg)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error generating template: %+v", err)
 				os.Exit(1)
 			}
 
-			templateString, err := tmpl.Load(cfg.Fields)
+			fieldsPath := paths.Resolve(paths.Config, cfg.Fields)
+			templateString, err := tmpl.Load(fieldsPath)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error generating template: %+v", err)
 				os.Exit(1)
