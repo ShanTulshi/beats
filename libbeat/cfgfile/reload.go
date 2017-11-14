@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/paths"
@@ -51,7 +52,6 @@ type RunnerFactory interface {
 type Runner interface {
 	Start()
 	Stop()
-	ID() uint64
 }
 
 // Reloader is used to register and reload modules
@@ -71,6 +71,10 @@ func NewReloader(cfg *common.Config) *Reloader {
 	path := config.Path
 	if !filepath.IsAbs(path) {
 		path = paths.Resolve(paths.Config, path)
+	}
+
+	if config.Reload.Enabled {
+		cfgwarn.Beta("Dynamic config reload is enabled.")
 	}
 
 	return &Reloader{
@@ -130,7 +134,7 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 
 	gw := NewGlobWatcher(rl.path)
 
-	// If reloading is disable, config files should be loaded immidiately
+	// If reloading is disable, config files should be loaded immediately
 	if !rl.config.Reload.Enabled {
 		rl.config.Reload.Period = 0
 	}

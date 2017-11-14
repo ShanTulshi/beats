@@ -23,6 +23,7 @@ grouped in the following categories:
 * <<exported-fields-docker>>
 * <<exported-fields-dropwizard>>
 * <<exported-fields-elasticsearch>>
+* <<exported-fields-etcd>>
 * <<exported-fields-golang>>
 * <<exported-fields-graphite>>
 * <<exported-fields-haproxy>>
@@ -32,6 +33,7 @@ grouped in the following categories:
 * <<exported-fields-kibana>>
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-kubernetes>>
+* <<exported-fields-logstash>>
 * <<exported-fields-memcached>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
@@ -1065,7 +1067,7 @@ Shows how many osds are on the state of IN
 
 
 [float]
-=== `ceph.cluster_status.osd.num_in_osds`
+=== `ceph.cluster_status.osd.num_remapped_pgs`
 
 type: long
 
@@ -1189,6 +1191,117 @@ Total bytes of MON
 type: long
 
 Last updated
+
+
+[float]
+== osd_tree fields
+
+ceph osd tree info
+
+
+
+[float]
+=== `ceph.osd_tree.id`
+
+type: long
+
+osd or bucket node id
+
+
+[float]
+=== `ceph.osd_tree.name`
+
+type: text
+
+osd or bucket node name
+
+
+[float]
+=== `ceph.osd_tree.type`
+
+type: keyword
+
+osd or bucket node type, illegal type include osd, host, root etc.
+
+
+[float]
+=== `ceph.osd_tree.type_id`
+
+type: long
+
+osd or bucket node typeID
+
+
+[float]
+=== `ceph.osd_tree.children`
+
+type: text
+
+bucket children list, seperate by comma.
+
+
+[float]
+=== `ceph.osd_tree.crush_weight`
+
+type: float
+
+osd node crush weight
+
+
+[float]
+=== `ceph.osd_tree.depth`
+
+type: long
+
+node depth
+
+
+[float]
+=== `ceph.osd_tree.exists`
+
+type: boolean
+
+is node still exist or not(1-yes, 0-no)
+
+
+[float]
+=== `ceph.osd_tree.primary_affinity`
+
+type: float
+
+the weight of reading data from primary osd
+
+
+[float]
+=== `ceph.osd_tree.reweight`
+
+type: long
+
+the reweight of osd
+
+
+[float]
+=== `ceph.osd_tree.status`
+
+type: keyword
+
+status of osd, it should be up or down
+
+
+[float]
+=== `ceph.osd_tree.device_class`
+
+type: keyword
+
+the device class of osd, like hdd, ssd etc.
+
+
+[float]
+=== `ceph.osd_tree.father`
+
+type: keyword
+
+the parent node of this osd or bucket node
 
 
 [float]
@@ -1908,6 +2021,14 @@ Container status.
 
 
 [float]
+=== `docker.container.ip_addresses`
+
+type: keyword
+
+Container IP addresses.
+
+
+[float]
 == size fields
 
 Container size metrics.
@@ -2469,24 +2590,6 @@ node
 
 
 [float]
-=== `elasticsearch.node.jvm.memory.heap_init.bytes`
-
-type: long
-
-format: bytes
-
-Heap init used by the JVM in bytes.
-
-
-[float]
-=== `elasticsearch.node.jvm.version`
-
-type: keyword
-
-JVM version.
-
-
-[float]
 === `elasticsearch.node.name`
 
 type: keyword
@@ -2500,6 +2603,69 @@ Node name.
 type: keyword
 
 Node version.
+
+
+[float]
+== jvm fields
+
+JVM Info.
+
+
+
+[float]
+=== `elasticsearch.node.jvm.version`
+
+type: keyword
+
+JVM version.
+
+
+[float]
+=== `elasticsearch.node.jvm.memory.heap.init.bytes`
+
+type: long
+
+format: bytes
+
+Heap init used by the JVM in bytes.
+
+
+[float]
+=== `elasticsearch.node.jvm.memory.heap.max.bytes`
+
+type: long
+
+format: bytes
+
+Heap max used by the JVM in bytes.
+
+
+[float]
+=== `elasticsearch.node.jvm.memory.nonheap.init.bytes`
+
+type: long
+
+format: bytes
+
+Non-Heap init used by the JVM in bytes.
+
+
+[float]
+=== `elasticsearch.node.jvm.memory.nonheap.max.bytes`
+
+type: long
+
+format: bytes
+
+Non-Heap max used by the JVM in bytes.
+
+
+[float]
+=== `elasticsearch.node.process.mlockall`
+
+type: boolean
+
+If process locked in memory.
 
 
 [float]
@@ -2742,6 +2908,311 @@ type: long
 type: long
 
 
+
+[float]
+== fs.summary fields
+
+File system summary
+
+
+
+[float]
+=== `elasticsearch.node.stats.fs.summary.total.bytes`
+
+type: long
+
+format: bytes
+
+
+
+[float]
+=== `elasticsearch.node.stats.fs.summary.free.bytes`
+
+type: long
+
+format: bytes
+
+
+
+[float]
+=== `elasticsearch.node.stats.fs.summary.available.bytes`
+
+type: long
+
+format: bytes
+
+
+
+[[exported-fields-etcd]]
+== Etcd fields
+
+[]experimental
+etcd Module
+
+
+
+[float]
+== etcd fields
+
+`etcd` contains statistics that were read from Etcd
+
+
+
+[float]
+== leader fields
+
+Contains etcd leader statistics.
+
+
+
+[float]
+== followers.counts fields
+
+The number of failed and successful Raft RPC requests.
+
+
+
+[float]
+=== `etcd.leader.followers.counts.followers.counts.success`
+
+type: integer
+
+[float]
+=== `etcd.leader.followers.counts.followers.counts.fail`
+
+type: integer
+
+[float]
+== followers.latency fields
+
+latency to each peer in the cluster
+
+
+
+[float]
+=== `etcd.leader.followers.latency.followers.latency.average`
+
+type: scaled_float
+
+[float]
+=== `etcd.leader.followers.latency.followers.latency.current`
+
+type: scaled_float
+
+[float]
+=== `etcd.leader.followers.latency.followers.latency.maximum`
+
+type: scaled_float
+
+[float]
+=== `etcd.leader.followers.latency.followers.latency.minimum`
+
+type: integer
+
+[float]
+=== `etcd.leader.followers.latency.follower.latency.standardDeviation`
+
+type: scaled_float
+
+[float]
+=== `etcd.leader.leader`
+
+type: keyword
+
+[float]
+== self fields
+
+Contains etcd self statistics.
+
+
+
+[float]
+=== `etcd.self.id`
+
+type: keyword
+
+the unique identifier for the member
+
+
+[float]
+=== `etcd.self.leaderinfo.leader`
+
+type: keyword
+
+id of the current leader member
+
+
+[float]
+=== `etcd.self.leaderinfo.starttime`
+
+type: keyword
+
+[float]
+=== `etcd.self.leaderinfo.uptime`
+
+type: keyword
+
+id of the current leader member
+
+
+[float]
+=== `etcd.self.name`
+
+type: keyword
+
+this member's name
+
+
+[float]
+=== `etcd.self.recv.appendrequest.count`
+
+type: integer
+
+number of append requests this node has processed
+
+
+[float]
+=== `etcd.self.recv.bandwithrate`
+
+type: scaled_float
+
+number of bytes per second this node is receiving (follower only)
+
+
+[float]
+=== `etcd.self.recv.pkgrate`
+
+type: scaled_float
+
+number of requests per second this node is receiving (follower only)
+
+
+[float]
+=== `etcd.self.send.appendrequest.count`
+
+type: integer
+
+number of requests that this node has sent
+
+
+[float]
+=== `etcd.self.send.bandwithrate`
+
+type: scaled_float
+
+number of bytes per second this node is sending (leader only). This value is undefined on single member clusters.
+
+
+[float]
+=== `etcd.self.send.pkgrate`
+
+type: scaled_float
+
+number of requests per second this node is sending (leader only). This value is undefined on single member clusters.
+
+
+[float]
+=== `etcd.self.starttime`
+
+type: keyword
+
+the time when this node was started
+
+
+[float]
+=== `etcd.self.state`
+
+type: keyword
+
+either leader or follower
+
+
+[float]
+== store fields
+
+The store statistics include information about the operations that this node has handled.
+
+
+
+[float]
+=== `etcd.store.gets.success`
+
+type: integer
+
+[float]
+=== `etcd.store.gets.fail`
+
+type: integer
+
+[float]
+=== `etcd.store.sets.success`
+
+type: integer
+
+[float]
+=== `etcd.store.sets.fail`
+
+type: integer
+
+[float]
+=== `etcd.store.delete.success`
+
+type: integer
+
+[float]
+=== `etcd.store.delete.fail`
+
+type: integer
+
+[float]
+=== `etcd.store.update.success`
+
+type: integer
+
+[float]
+=== `etcd.store.update.fail`
+
+type: integer
+
+[float]
+=== `etcd.store.create.success`
+
+type: integer
+
+[float]
+=== `etcd.store.create.fail`
+
+type: integer
+
+[float]
+=== `etcd.store.compareandswap.success`
+
+type: integer
+
+[float]
+=== `etcd.store.compareandswap.fail`
+
+type: integer
+
+[float]
+=== `etcd.store.compareanddelete.success`
+
+type: integer
+
+[float]
+=== `etcd.store.compareanddelete.fail`
+
+type: integer
+
+[float]
+=== `etcd.store.expire.count`
+
+type: integer
+
+[float]
+=== `etcd.store.watchers`
+
+type: integer
 
 [[exported-fields-golang]]
 == Golang fields
@@ -4039,7 +4510,7 @@ HTTP request information
 [float]
 === `http.request.header`
 
-type: nested
+type: object
 
 The HTTP headers sent
 
@@ -4070,17 +4541,29 @@ HTTP response information
 [float]
 === `http.response.header`
 
-type: nested
+type: object
 
 The HTTP headers received
 
 
 [float]
-=== `http.response.status_code`
+=== `http.response.code`
 
 type: keyword
 
+example: 404
+
 The HTTP status code
+
+
+[float]
+=== `http.response.phrase`
+
+type: keyword
+
+example: Not found
+
+The HTTP status phrase
 
 
 [float]
@@ -4733,7 +5216,7 @@ The Kubernetes events metricset collects events that are generated by objects ru
 
 type: long
 
-Count field records the number of times the particular event has occured
+Count field records the number of times the particular event has occurred
 
 
 [float]
@@ -5663,6 +6146,66 @@ Free inodes
 type: long
 
 Total inodes
+
+
+[[exported-fields-logstash]]
+== Logstash fields
+
+experimental[]
+Logstash module
+
+
+
+[float]
+== logstash fields
+
+
+
+
+[float]
+== node fields
+
+node
+
+
+
+[float]
+=== `logstash.node.host`
+
+type: keyword
+
+Host name
+
+
+[float]
+=== `logstash.node.version`
+
+type: keyword
+
+Logstash Version
+
+
+[float]
+== jvm fields
+
+JVM Info
+
+
+
+[float]
+=== `logstash.node.jvm.version`
+
+type: keyword
+
+Version
+
+
+[float]
+=== `logstash.node.jvm.pid`
+
+type: long
+
+Pid
 
 
 [[exported-fields-memcached]]
@@ -7009,6 +7552,14 @@ The name of the pool.
 
 
 [float]
+=== `php_fpm.pool.process_manager`
+
+type: keyword
+
+Static, dynamic or ondemand.
+
+
+[float]
 == connections fields
 
 Connection state specific statistics.
@@ -7029,6 +7580,22 @@ The number of incoming requests that the PHP-FPM server has accepted; when a con
 type: long
 
 The current number of connections that have been initiated, but not yet accepted. If this value is non-zero it typically means that all the available server processes are currently busy, and there are no processes available to serve the next request. Raising `pm.max_children` (provided the server can handle it) should help keep this number low. This property follows from the fact that PHP-FPM listens via a socket (TCP or file based), and thus inherits some of the characteristics of sockets.
+
+
+[float]
+=== `php_fpm.pool.connections.max_listen_queue`
+
+type: long
+
+The maximum number of requests in the queue of pending connections since FPM has started.
+
+
+[float]
+=== `php_fpm.pool.connections.listen_queue_len`
+
+type: long
+
+The size of the socket queue of pending connections.
 
 
 [float]
@@ -7055,11 +7622,53 @@ The number of servers current processing a page - the minimum is `1` (so even on
 
 
 [float]
+=== `php_fpm.pool.processes.total`
+
+type: long
+
+The number of idle + active processes.
+
+
+[float]
+=== `php_fpm.pool.processes.max_active`
+
+type: long
+
+The maximum number of active processes since FPM has started.
+
+
+[float]
+=== `php_fpm.pool.processes.max_children_reached`
+
+type: long
+
+Number of times, the process limit has been reached, when pm tries to start more children (works only for pm 'dynamic' and 'ondemand').
+
+
+[float]
 === `php_fpm.pool.slow_requests`
 
 type: long
 
 The number of times a request execution time has exceeded `request_slowlog_timeout`.
+
+
+[float]
+=== `php_fpm.pool.start_since`
+
+type: long
+
+Number of seconds since FPM has started.
+
+
+[float]
+=== `php_fpm.pool.start_time`
+
+type: date
+
+format: epoch_second
+
+The date and time FPM has started.
 
 
 [[exported-fields-postgresql]]
@@ -7850,6 +8459,153 @@ Node type.
 type: long
 
 Node uptime.
+
+
+[float]
+== queue fields
+
+queue
+
+
+
+[float]
+=== `rabbitmq.queue.name`
+
+type: keyword
+
+The name of the queue with non-ASCII characters escaped as in C.
+
+
+[float]
+=== `rabbitmq.queue.vhost`
+
+type: keyword
+
+Virtual host name with non-ASCII characters escaped as in C.
+
+
+[float]
+=== `rabbitmq.queue.durable`
+
+type: boolean
+
+Whether or not the queue survives server restarts.
+
+
+[float]
+=== `rabbitmq.queue.auto_delete`
+
+type: boolean
+
+Whether the queue will be deleted automatically when no longer used.
+
+
+[float]
+=== `rabbitmq.queue.exclusive`
+
+type: boolean
+
+Whether the queue is exclusive (i.e. has owner_pid).
+
+
+[float]
+=== `rabbitmq.queue.node`
+
+type: keyword
+
+Node name.
+
+
+[float]
+=== `rabbitmq.queue.state`
+
+type: keyword
+
+The state of the queue. Normally 'running', but may be "{syncing, MsgCount}" if the queue is synchronising. Queues which are located on cluster nodes that are currently down will be shown with a status of 'down'.
+
+
+[float]
+=== `rabbitmq.queue.arguments.max_priority`
+
+type: long
+
+Maximum number of priority levels for the queue to support.
+
+
+[float]
+=== `rabbitmq.queue.consumers.count`
+
+type: long
+
+Number of consumers.
+
+
+[float]
+=== `rabbitmq.queue.consumers.utilisation.pct`
+
+type: long
+
+format: percentage
+
+Fraction of the time (between 0.0 and 1.0) that the queue is able to immediately deliver messages to consumers. This can be less than 1.0 if consumers are limited by network congestion or prefetch count.
+
+
+[float]
+=== `rabbitmq.queue.messages.total.count`
+
+type: long
+
+Sum of ready and unacknowledged messages (queue depth).
+
+
+[float]
+=== `rabbitmq.queue.messages.ready.count`
+
+type: long
+
+Number of messages ready to be delivered to clients.
+
+
+[float]
+=== `rabbitmq.queue.messages.unacknowledged.count`
+
+type: long
+
+Number of messages delivered to clients but not yet acknowledged.
+
+
+[float]
+=== `rabbitmq.queue.messages.persistent.count`
+
+type: long
+
+Total number of persistent messages in the queue (will always be 0 for transient queues).
+
+
+[float]
+=== `rabbitmq.queue.memory.bytes`
+
+type: long
+
+format: bytes
+
+Bytes of memory consumed by the Erlang process associated with the queue, including stack, heap and internal structures.
+
+
+[float]
+=== `rabbitmq.queue.disk.reads.count`
+
+type: long
+
+Total number of times messages have been read from disk by this queue since it started.
+
+
+[float]
+=== `rabbitmq.queue.disk.writes.count`
+
+type: long
+
+Total number of times messages have been written to disk by this queue since it started.
 
 
 [[exported-fields-redis]]
@@ -9080,7 +9836,7 @@ The average queue length of the requests that were issued to the device.
 
 type: float
 
-The average queue length of the requests that were issued to the device.
+The average time spent for requests issued to the device to be served.
 
 
 [float]
@@ -10725,6 +11481,9 @@ Free Memory of Guest in bytes
 
 type: object
 
+Custom fields      
+
+
 [[exported-fields-windows]]
 == Windows fields
 
@@ -10735,6 +11494,56 @@ beta[] Module for Windows
 [float]
 == windows fields
 
+
+
+
+[float]
+== service fields
+
+`service` contains the status for windows services.
+
+
+
+[float]
+=== `windows.service.uptime.ms`
+
+type: long
+
+format: duration
+
+`uptime` contains the service uptime metric.
+
+
+[float]
+=== `windows.service.name`
+
+type: keyword
+
+The service name.
+
+
+[float]
+=== `windows.service.display_name`
+
+type: keyword
+
+The display name of the service.
+
+
+[float]
+=== `windows.service.start_type`
+
+type: keyword
+
+The start type of the service. The possible values are `ServiceAutoStart`, `ServiceBootStart`, `ServiceDemandStart`, `ServiceDisabled`, and `ServiceSystemStart`.
+
+
+[float]
+=== `windows.service.state`
+
+type: keyword
+
+The actual state of the service. The possible values are `ServiceContinuePending`, `ServicePausePending`, `ServicePaused`, `ServiceRunning`, `ServiceStartPending`, `ServiceStopPending`, and `ServiceStopped`.
 
 
 [[exported-fields-zookeeper]]

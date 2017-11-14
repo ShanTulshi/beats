@@ -44,7 +44,7 @@ func NewFactory(outlet channel.Factory, registrar *registrar.Registrar, beatVers
 // Create creates a module based on a config
 func (f *Factory) Create(c *common.Config) (cfgfile.Runner, error) {
 	// Start a registry of one module:
-	m, err := NewModuleRegistry([]*common.Config{c}, f.beatVersion)
+	m, err := NewModuleRegistry([]*common.Config{c}, f.beatVersion, false)
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +109,4 @@ func (p *prospectorsRunner) Stop() {
 	for _, prospector := range p.prospectors {
 		prospector.Stop()
 	}
-}
-func (p *prospectorsRunner) ID() uint64 {
-	return p.id
 }

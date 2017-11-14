@@ -2,6 +2,8 @@
 
 include::../../libbeat/docs/version.asciidoc[]
 
+include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
+
 :libbeat: http://www.elastic.co/guide/en/beats/libbeat/{doc-branch}
 :kibana-ref: https://www.elastic.co/guide/en/kibana/{doc-branch}
 :beatsdevguide: http://www.elastic.co/guide/en/beats/devguide/{doc-branch}
@@ -20,6 +22,8 @@ include::../../libbeat/docs/version.asciidoc[]
 :beatname_pkg: {beatname_lc}
 :security: X-Pack Security
 :dockerimage: docker.elastic.co/beats/{beatname_lc}:{version}
+:dockergithub: https://github.com/elastic/beats-docker/tree/{doc-branch}
+
 
 include::./overview.asciidoc[]
 
